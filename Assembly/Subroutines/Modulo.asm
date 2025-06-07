@@ -10,19 +10,15 @@ LD R1  DIV
 
 LD R2  MOD
 
-LD R3  MOD  ;COUNTER
-
-;; Først skal vi finde det største tal
-
-
+;2's complement af MOD
 NOT R2  R2
 ADD R2  R2  #1
 
 
 ADD R1  R1  R2
-BRz found ;hvis lig 0, så er mod lig R1 (er der en fejl her?)
+BRz found ;hvis lig 0, så er mod lig R1
 
-BRn notdiv ; hvis den er negativ kan vi ikke dividere og der er ikke en rest, vores divisor er derfor lig mod
+BRn notdiv ; hvis den er negativ ved første subtraktion kan vi ikke dividere og der er ikke en rest, vores divisor er derfor lig mod
 
 loop
 ADD R1  R1  R2
