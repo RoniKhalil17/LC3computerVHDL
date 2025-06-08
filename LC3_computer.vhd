@@ -454,7 +454,7 @@ begin
 
     elsif (address = IO_SSEG and WE = '1') then
         SSEG_en <= WE;
-    --elsif (address = IO_LED) then
+    --elsif (address = IO_LED and WE = '1') then
      --   LED_en <= WE;
     --elsif (address = IO_PLED) then
 
