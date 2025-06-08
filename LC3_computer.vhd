@@ -302,14 +302,14 @@ begin
 
    
    --Virtual Leds on Zybo VIO (active high)
-   led(0) <= '0';
-   led(1) <= '0';
-   led(2) <= '0'; 
-   led(3) <= '0'; 
-   led(4) <= '0'; 
-   led(5) <= '0'; 
-   led(6) <= '0'; 
-   led(7) <= '0'; 
+   --led(0) <= '0';
+   --led(1) <= '0';
+   --led(2) <= '0'; 
+   --led(3) <= '0'; 
+   --led(4) <= '0'; 
+   --led(5) <= '0'; 
+   --led(6) <= '0'; 
+   --led(7) <= '0'; 
 
    --Physical leds on the Zybo board (active high)
    pled(0) <= '0';
@@ -418,16 +418,16 @@ end process;
 hex <= SSEG_reg;
 
 --register LED
---process (clk) 
---    begin 
---      if (clk'event and clk = '1') then  
---        if (LED_en = '1') then
---          LED_reg <= data_out(7 downto 0);
---        end if;
---     end if;
---end process;
+process (clk) 
+    begin 
+      if (clk'event and clk = '1') then  
+        if (LED_en = '1') then
+          LED_reg <= data_out(7 downto 0);
+        end if;
+     end if;
+ end process;
 
---led <= LED_reg;
+led <= LED_reg;
 
 
 --address control logic
@@ -435,7 +435,7 @@ muxACL : process(address, RE, WE)
 begin
     mem_en <= '0';
     SSEG_en <= '0';
-    --LED_en <= '0';
+    LED_en <= '0';
    -- if (address = STDIN_S) then
         --data_in <= "0001";
     --elsif (address = STDIN_D) then
@@ -448,19 +448,21 @@ begin
            data_in <= "00000000" & sw;
     --elsif (address = IO_PSW) then
 
-    --elsif (address = IO_BTN) then
+    elsif (address = IO_BTN) then
+        data_in <= "00000000000" & btn;
 
     --elsif (address = IO_PBTN)then
 
     elsif (address = IO_SSEG and WE = '1') then
         SSEG_en <= WE;
-    --elsif (address = IO_LED and WE = '1') then
-     --   LED_en <= WE;
-    --elsif (address = IO_PLED) then
-
+    elsif (address = IO_LED and WE = '1') then --Test for LED er på 504
+        LED_en <= WE;
+    --elsif (address = IO_PLED and WE = '1') then
+       -- data_in <= "0000000000000" & pled;
     else --ram
     mem_en <= WE;
     data_in <= ram(to_integer(unsigned(addr_reg)));
     end if;
 end process muxACL;
+
 end Behavioral;
