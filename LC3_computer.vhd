@@ -121,9 +121,11 @@ architecture Behavioral of lc3_computer is
    signal SSEG_reg: std_logic_vector(15 downto 0);
    signal LED_en: std_logic;
    signal LED_reg: std_logic_vector(7 downto 0);
+   signal PLED_en: std_logic;
+   signal PLED_reg: std_logic_vector(2 downto 0);
    
    signal ram : ram_type := (
-  -- Empty Traps/Interrupt Tables
+-- Empty Traps/Interrupt Tables
    X"0000", X"0000", X"0000", X"0000", X"0000", X"0000", X"0000", X"0000",  -- addr 0 - 7
    X"0000", X"0000", X"0000", X"0000", X"0000", X"0000", X"0000", X"0000",  -- addr 8 - 15
    X"0000", X"0000", X"0000", X"0000", X"0000", X"0000", X"0000", X"0000",  -- addr 16 - 23
@@ -312,9 +314,9 @@ begin
    --led(7) <= '0'; 
 
    --Physical leds on the Zybo board (active high)
-   pled(0) <= '0';
-   pled(1) <= '0';
-   pled(2) <= '0';
+   --pled(0) <= '0';
+   --pled(1) <= '0';
+   --pled(2) <= '0';
 
    --Virtual hexadecimal display on Zybo VIO
    --hex <= X"1234"; 
@@ -429,6 +431,18 @@ process (clk)
 
 led <= LED_reg;
 
+--register PLED
+process (clk) 
+    begin 
+      if (clk'event and clk = '1') then  
+        if (PLED_en = '1') then
+          PLED_reg <= data_out(2 downto 0);
+        end if;
+     end if;
+ end process;
+
+pled <= PLED_reg;
+
 
 --address control logic
 muxACL : process(address, RE, WE)
@@ -436,32 +450,32 @@ begin
     mem_en <= '0';
     SSEG_en <= '0';
     LED_en <= '0';
-   -- if (address = STDIN_S) then
-        --data_in <= "0001";
-    --elsif (address = STDIN_D) then
+    PLED_en <= '0';
+    if (address = STDIN_S) then
+   --     data_in <= STDIN_S;
+    elsif (address = STDIN_D) then
+        
+    elsif (address = STDOUT_S) then
 
-    --elsif (address = STDOUT_S) then
+    elsif (address = STDOUT_D) then
 
-    --elsif (address = STDOUT_D) then
-
-    if (address = IO_SW) then
-           data_in <= "00000000" & sw;
-    --elsif (address = IO_PSW) then
-
+    elsif (address = IO_SW) then
+        data_in <= "00000000" & sw;
+    elsif (address = IO_PSW) then
+        data_in <= "000000000000" & psw;
     elsif (address = IO_BTN) then
         data_in <= "00000000000" & btn;
-
-    --elsif (address = IO_PBTN)then
-
+    elsif (address = IO_PBTN)then
+        data_in <= "000000000000" & pbtn;
     elsif (address = IO_SSEG and WE = '1') then
         SSEG_en <= WE;
-    elsif (address = IO_LED and WE = '1') then --Test for LED er på 504 og FE16
+    elsif (address = IO_LED and WE = '1') then
         LED_en <= WE;
-    --elsif (address = IO_PLED and WE = '1') then
-       -- data_in <= "0000000000000" & pled;
+    elsif (address = IO_PLED and WE = '1') then
+        PLED_en <= WE;
     else --ram
-    mem_en <= WE;
-    data_in <= ram(to_integer(unsigned(addr_reg)));
+        mem_en <= WE;
+        data_in <= ram(to_integer(unsigned(addr_reg)));
     end if;
 end process muxACL;
 
