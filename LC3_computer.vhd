@@ -455,7 +455,7 @@ begin
 
     elsif (address = IO_SSEG and WE = '1') then
         SSEG_en <= WE;
-    elsif (address = IO_LED and WE = '1') then --Test for LED er på 504
+    elsif (address = IO_LED and WE = '1') then --Test for LED er på 504 og FE16
         LED_en <= WE;
     --elsif (address = IO_PLED and WE = '1') then
        -- data_in <= "0000000000000" & pled;
