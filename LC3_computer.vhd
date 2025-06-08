@@ -463,3 +463,4 @@ begin
     data_in <= ram(to_integer(unsigned(addr_reg)));
     end if;
 end process muxACL;
+end Behavioral;
