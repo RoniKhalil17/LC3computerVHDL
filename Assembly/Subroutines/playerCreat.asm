@@ -8,6 +8,14 @@ str r0, r1, #0  ; gemmer bogstavet
 add r1, r1, #1  ;rykker en plads
 add r2, r2, #-1 ;-1 så man kommer ud af loopet på det rigtige tidspunkt.
 brnp loop   ;loop
+add r1, r1, #1  ;rykker en plads for at gør plads til null termintor
+LD  r0, startMoney
+str r0, r1, #0  ; slut bogstavet
+LEA R0, player1 ;loader adressen til arrayet ind
+puts 
 halt    ;er ikke done men det er en start
-player1  .blkw #3 
+startMoney .fill #300   ;er bare et eksempel på man kan start med penge
+player1  .blkw #14
+player2  .blkw #14
+player3  .blkw #14
 .end
