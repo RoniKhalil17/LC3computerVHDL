@@ -34,7 +34,3 @@ player1  .blkw #16  ; indholder 4 til navn, 1 til holde score, 10 til at indhold
 player2  .blkw #16
 player3  .blkw #16
 .END
-player1  .blkw #16  ; indholder 4 til navn, 1 til holde score, 10 til at indholde historik en til null termintor og buffer.
-player2  .blkw #16
-player3  .blkw #16
-.END
