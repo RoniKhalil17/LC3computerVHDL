@@ -1,6 +1,5 @@
 .orig x0500
-JSR createplayer
-halt
+
 createplayer
 and r3, r3, #0  ;nulstiller r3.
 add r3, r3, #3 ; antal spiller.
@@ -25,8 +24,7 @@ add r0, r0, r4  ; laver char til tal
 brz done        ; hvis 0 bliver tastet ind så er alle spiller med.
 add r3, r3, #-1
 brp nySpiller
-done    ;nå alle spiller er med.
-RET
+    ;nå alle spiller er med.
 ;;halt    ;er ikke done men det er en start
 startMoney .fill #300   ;er bare et eksempel på man kan start med penge
 tilTal       .fill #-48
@@ -35,7 +33,7 @@ player2  .blkw #16
 player3  .blkw #16
 
 ;;PseudoRandom 
-
+done
 ;; formel: X_n+1 = (a*X_n+c) modulus m
 ;; regler:
 ;; Vores første tal X_0 er et seed, valgt af os
@@ -127,24 +125,22 @@ NOT R2  R2
 ADD R2  R2  #1
 ADD R1  R1  R2
 ADD R5  R1  #0
-BRnzp stop
+BRnzp hop1
 
 
 
 found
 ADD R5  R1  #0
-brnzp stop
+brnzp hop1
 
 notdiv
 AND R1  R1  #0
 ADD R1  R1  R0
 ADD R5  R5  R1
-brnzp stop ;;skal hoppe et andet sted hen
+brnzp hop1 ;;skal hoppe et andet sted hen
 
 
-stop
-
-halt
+hop1
 ;DIV .FILL #27
 
 ;MOD .FILL #4
@@ -193,7 +189,7 @@ ADD R0  R0  #1
 ADD R1  R1  #-1
 BRp arrloop
 
-BRZ stop
+BRZ hop2
 
 
 
@@ -217,7 +213,7 @@ sekund  .FILL   #8000
 teller  .FILL   #1111
 
 label   .fill   xFE12
-stop
+hop2
 halt
 
 
