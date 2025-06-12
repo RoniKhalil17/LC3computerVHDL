@@ -1,4 +1,7 @@
 .orig x3000
+JSR createplayer
+halt
+createplayer
 and r3, r3, #0  ;nulstiller r3.
 add r3, r3, #3 ; antal spiller.
 LEA R1, player1 ; loader adressen til arrayet ind
@@ -23,9 +26,14 @@ brz done        ; hvis 0 bliver tastet ind så er alle spiller med.
 add r3, r3, #-1
 brp nySpiller
 done    ;nå alle spiller er med.
-halt    ;er ikke done men det er en start
+RET
+;;halt    ;er ikke done men det er en start
 startMoney .fill #300   ;er bare et eksempel på man kan start med penge
 tilTal       .fill #-48
+player1  .blkw #16  ; indholder 4 til navn, 1 til holde score, 10 til at indholde historik en til null termintor og buffer.
+player2  .blkw #16
+player3  .blkw #16
+.END
 player1  .blkw #16  ; indholder 4 til navn, 1 til holde score, 10 til at indholde historik en til null termintor og buffer.
 player2  .blkw #16
 player3  .blkw #16
