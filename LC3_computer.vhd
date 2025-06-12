@@ -7,7 +7,7 @@ use IEEE.numeric_std.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
@@ -49,7 +49,11 @@ entity lc3_computer is
 		--LC3 CPU inputs
       cpu_clk_enable   : in  std_logic;
       sys_reset        : in  std_logic;
-      sys_program      : in  std_logic
+      sys_program      : in  std_logic;
+      
+      --UART PC
+      PC_rx : in std_logic;
+      PC_tx : out std_logic
    );
 end lc3_computer;
 
@@ -112,20 +116,10 @@ architecture Behavioral of lc3_computer is
    ---<<<<< End of pregenerated code >>>>>---
    ---<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>---
    
+   -- Signal and declarations for memory
    type ram_type is array (0 to 2**16-1) of std_logic_vector (15 downto 0);
-   
    signal addr_reg: std_logic_vector(15 downto 0);
    signal mem_en: std_logic;
-   
-   signal SSEG_en: std_logic;
-   signal SSEG_reg: std_logic_vector(15 downto 0);
-   signal LED_en: std_logic;
-   signal LED_reg: std_logic_vector(7 downto 0);
-   signal PLED_en: std_logic;
-   signal PLED_reg: std_logic_vector(2 downto 0);
-   signal rx_reg : std_logic_vector(7 downto 0);
-   signal rx_en : std_logic;
-   
    
    signal ram : ram_type := (
 -- Trap Vector Table             (0-255)
@@ -426,8 +420,33 @@ architecture Behavioral of lc3_computer is
    X"0020", X"005b", X"0020", X"005d", X"000a", X"0000", X"e3ed", X"e5fe",  -- addr 0x0910 to 0x0917
    X"14bc", X"f020", X"7080", X"1060", X"f022", X"0ffb",  -- addr 0x0918 to 0x091e
    others => X"0000"
-
-   );
+      );
+   
+   -- Signals for Adress control logic (IO registers)
+   signal SSEG_en: std_logic;
+   signal SSEG_reg: std_logic_vector(15 downto 0);
+   signal LED_en: std_logic;
+   signal LED_reg: std_logic_vector(7 downto 0);
+   signal PLED_en: std_logic;
+   signal PLED_reg: std_logic_vector(2 downto 0);
+   signal tx_reg: std_logic_vector(7 downto 0);
+   
+   --UART PC
+   signal PC_rx_data:  std_logic_vector(7 downto 0);
+   signal PC_rx_rd: std_logic;
+   signal PC_rx_empty: std_logic;
+   signal PC_tx_data: std_logic_vector(7 downto 0);
+   signal PC_tx_wr: std_logic;
+   signal PC_tx_full: std_logic;
+   --signal PC_rx: std_logic;
+   --signal PC_tx: std_logic; 
+   
+   --UART PC adresse constant
+   constant PC_STDIN_S    : std_logic_vector(15 downto 0) := X"FE18";  -- Serial IN (terminal keyboard)
+   constant PC_STDIN_D    : std_logic_vector(15 downto 0) := X"FE1A";
+   constant PC_STDOUT_S   : std_logic_vector(15 downto 0) := X"FE1C";  -- Serial OUT (terminal  display)
+   constant PC_STDOUT_D   : std_logic_vector(15 downto 0) := X"FE1E";
+   
    
 begin
   ---<<<<<<<<<<<<<<>>>>>>>>>>>>>>>---
@@ -580,38 +599,31 @@ process (clk)
 
 pled <= PLED_reg;
 
---register uart reciever
--- process (clk) 
-  --  begin 
-   --   if (clk'event and clk = '1') then  
- --       if (rx_en = '1') then
-       --   rx_reg <= data_out(7 downto 0);
-     --   end if;
-   --  end if;
- --end process;
-
-tx_data<=data_out(7 downto 0);
+tx_data <= data_out(7 downto 0);
+pc_tx_data <= data_out(7 downto 0);
 
 
 --address control logic
-muxACL : process(address, RE, WE)
+muxACL : process(address, RE, WE, rx_empty,tx_full, PC_rx_empty, PC_tx_full)
 begin
+    data_in <= ram(to_integer(unsigned(addr_reg)));
     mem_en <= '0';
     SSEG_en <= '0';
     LED_en <= '0';
     PLED_en <= '0';
+    tx_wr <= '0';
     rx_rd <= '0';
-    tx_wr<= '0';
-    if (address = STDIN_S and RE='1') then -- reciever --status
-       data_in<=not(rx_empty) & "000000000000000";
-       
-    elsif (address = STDIN_D and RE='1') then -- data
-     data_in <= "00000000" & rx_data;
-     rx_rd <='1';
-    elsif (address = STDOUT_S) then --transmitter -status
-        data_in<=not(tx_full) & "000000000000000";
-    elsif (address = STDOUT_D and WE='1') then -- data
-        tx_wr<= '1';
+    Pc_rx_rd <= '0';
+    Pc_tx_wr <= '0';
+    if (address = STDIN_S) then
+        data_in <= not(rx_empty) & "000000000000000";
+    elsif (address = STDIN_D and RE = '1') then
+        data_in <= "00000000" & rx_data;
+        rx_rd <= '1';
+    elsif (address = STDOUT_S) then
+        data_in <= not(tx_full) & "000000000000000";    
+    elsif (address = STDOUT_D and WE = '1') then
+        tx_wr <= '1';
     elsif (address = IO_SW) then
         data_in <= "00000000" & sw;
     elsif (address = IO_PSW) then
@@ -626,11 +638,35 @@ begin
         LED_en <= WE;
     elsif (address = IO_PLED and WE = '1') then
         PLED_en <= WE;
+    elsif (address = PC_STDIN_S) then
+        data_in <= not(PC_rx_empty) & "000000000000000";
+    elsif (address = PC_STDIN_D and RE = '1') then
+        data_in <= "00000000" & PC_rx_data;
+        Pc_rx_rd <= '1';
+    elsif (address = PC_STDOUT_S and RE = '1') then
+        data_in <= not(PC_tx_full) & "000000000000000"; 
+    elsif (address = PC_STDOUT_D and WE = '1') then
+        PC_tx_wr <= '1';
     else --ram
         mem_en <= WE;
         data_in <= ram(to_integer(unsigned(addr_reg)));
-        
     end if;
 end process muxACL;
 
+UART: entity work.uart
+   port map(
+        clk     =>  clk,
+        reset   =>  sys_reset,
+        rd_uart =>  PC_rx_rd,
+        wr_uart =>  PC_tx_wr,
+        rx      =>  PC_rx,
+        w_data  =>  PC_tx_data,
+        tx_full =>  PC_tx_full,
+        rx_empty=> PC_rx_empty,
+        r_data  => PC_rx_data,
+        tx      => PC_tx
+   );
+
+
 end Behavioral;
+
