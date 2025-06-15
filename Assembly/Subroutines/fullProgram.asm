@@ -1,11 +1,5 @@
 .orig x0500
 
-newgame
-
-AND R0  R0  #0
-
-ST  R0  bet
-
 createplayer
 and r3, r3, #0  ;nulstiller r3.
 add r3, r3, #3 ; antal spiller.
@@ -198,33 +192,6 @@ ST  R0  betnumber
 AND R2  R2  #0
 
 ADD R2  R1  #0
-brnzp continue
-
-;;----VÆRDIER----;;
-sekund  .FILL   #800
-
-teller  .FILL   #111
-
-label   .fill   xFE12
-
-tal     .FILL   #-48
-
-bet     .FILL   #0
-
-betnumber .FILL #0
-
-Hjul    .FILL   x0001
-        .FILL   x0002
-        .FILL   x0003
-        .FILL   x0004
-        .FILL   x0005
-        .FILL   x0006
-        .FILL   x0007
-        .FILL   x0008
-        .FILL   x0009
-        .FILL   x10
-
-continue
 
 
 ;;----Button----;;
@@ -292,7 +259,7 @@ BRp tickloop
 ADD R6  R6  #-1
 BRp tellerloop
 
-ST R0  label
+STI R0  label
 ADD R0  R0  #1
 ADD R1  R1  #-1
 BRp arrloop
@@ -330,7 +297,7 @@ multiloop
 ADD R1  R1  R3
 ADD R2  R2  #-1
 BRp multiloop
-BRnz addscore
+BRz addscore
 ;;--ADD CURRENCY TO SCORE--;;
 ;;Nuværende vigtige register er R1
 addscore
@@ -344,67 +311,48 @@ BR restart
 
 
 
+betstr  .STRINGZ "How much do you wish to bet?"
+
+numbet  .STRINGZ "Which number do you wish to bet on?"
+
+btnstr  .STRINGZ "Press 1 to spin wheel"
+
+winstr  .STRINGZ "You win!"
+
+losestr .STRINGZ "You lose!"
+
+buststr .STRINGZ "You've gone bust!"
+
+
+Hjul    .FILL   x0001
+        .FILL   x0002
+        .FILL   x0003
+        .FILL   x0004
+        .FILL   x0005
+        .FILL   x0006
+        .FILL   x0007
+        .FILL   x0008
+        .FILL   x0009
+        .FILL   x10
+
+
+
+sekund  .FILL   #8000
+
+teller  .FILL   #1111
+
+label   .fill   xFE12
+
+tal     .FILL   #-48
+
+bet     .FILL   #0
+
+betnumber .FILL #0
+
+
 restart
-LEA R0  repeatbet
-
-PUTS
-
-LEA R0  yes
-
-PUTS
-
-LEA R0  no
-
-PUTS
-
-AND R0  R0  #0
-AND R1  R1  #0
-AND R2  R2  #0
-AND R3  R3  #0
-AND R4  R4  #0
-AND R6  R6  #0
-
-;;--Tjek for at se om spillet skal fortsætte--;;
-
-IN
-
-LD  R1  tal
-
-NOT R1  R1  
-
-ADD R1  R1  #1
-
-ADD R0  R0  R1
-
-ADD R0  R0  #-1
-brz newgame
-brnp stop
-
-
-
-betstr  .STRINGZ "How much do you wish to bet? "
-
-numbet  .STRINGZ "Which number do you wish to bet on? "
-
-btnstr  .STRINGZ "Press 1 to spin wheel "
-
-winstr  .STRINGZ "You win! "
-
-losestr .STRINGZ "You lose! "
-
-buststr .STRINGZ "You've gone bust! "
-
-repeatbet .STRINGZ "Do you want to bet again? "
-
-yes     .STRINGZ "If yes, press 1! "
-
-no      .STRINGZ "If no, press any other button! "
-
-
-
-
-stop
 halt
 
 
 .end
+
