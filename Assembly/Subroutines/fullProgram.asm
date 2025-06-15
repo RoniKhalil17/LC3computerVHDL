@@ -189,6 +189,10 @@ ADD R0  R0  R1
 
 ST  R0  betnumber
 
+AND R2  R2  #0
+
+ADD R2  R1  #0
+
 
 ;;----Button----;;
 ;;R5 er reserveret indtil efter wheel er kørt
@@ -196,7 +200,6 @@ ST  R0  betnumber
 inputloop
 AND R0  R0  #0
 AND R1  R1  #0
-AND R2  R2  #0
 AND R3  R3  #0
 AND R4  R4  #0
 AND R6  R6  #0
@@ -264,6 +267,37 @@ BRp arrloop
 BRZ hop2
 
 ;;--WINMULTIPLYER--;;
+;; R0 og R2 er reserveret værdier, som holder, henholdsvis hjultal og bet tal.
+hop2
+ADD R0  R0  #-1
+
+NOT R2  R2  
+
+ADD R2  R2  #1
+
+ADD R0  R0  R2
+BRz wonbet
+
+
+
+wonbet
+;; multiply by x factor
+LEA R0  winstr
+
+OUT
+
+LD  R1  bet
+
+LD  R2  betnumber
+
+
+multiloop
+ADD R1  R1  R1
+ADD R2  R2  #-1
+BRp multiloop
+BRz restart
+
+
 
 
 
@@ -272,6 +306,12 @@ betstr  .STRINGZ "How much do you wish to bet?"
 numbet  .STRINGZ "Which number do you wish to bet on?"
 
 btnstr  .STRINGZ "Press 1 to spin wheel"
+
+winstr  .STRINGZ "You win!"
+
+losestr .STRINGZ "You lose!"
+
+buststr .STRINGZ "You've gone bust!"
 
 
 Hjul    .FILL   x0001
@@ -300,7 +340,7 @@ bet     .FILL   x4000
 betnumber .FILL x4001
 
 
-hop2
+restart
 halt
 
 
