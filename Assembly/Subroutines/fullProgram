@@ -1,4 +1,4 @@
-.orig x0500
+.orig x3000
 
 createplayer
 and r3, r3, #0  ;nulstiller r3.
@@ -151,6 +151,8 @@ brnzp hop1 ;;skal hoppe et andet sted hen
 hop1
 ;;----Button----;;
 ;;R5 er reserveret indtil efter wheel er kørt
+
+inputloop
 AND R0  R0  #0
 AND R1  R1  #0
 AND R2  R2  #0
@@ -158,20 +160,27 @@ AND R3  R3  #0
 AND R4  R4  #0
 AND R6  R6  #0
 
-LEA R1  btnstr
+LEA R0  btnstr
 
-strloop
-LDR R0  R1  #0
-BRz click
 PUTS
-ADD R1  R1  #1
-BR strloop
 
+AND R0  R0  #0
 
+IN
+
+LD  R1  tal
+
+ADD R0  R0  R1
+
+ADD R0  R0  #-1
+brz click
+
+brnp inputloop
 
 
 
 ;;Wheel Subroutine
+
 click
 AND R0  R0  #0
 AND R1  R1  #0
@@ -206,7 +215,7 @@ BRp tickloop
 ADD R6  R6  #-1
 BRp tellerloop
 
-STI R0  label
+ST R0  label
 ADD R0  R0  #1
 ADD R1  R1  #-1
 BRp arrloop
@@ -214,7 +223,7 @@ BRp arrloop
 BRZ hop2
 
 
-
+btnstr  .STRINGZ "Press 1 to spin wheel"
 
 
 Hjul    .FILL   x0001
@@ -236,18 +245,9 @@ teller  .FILL   #1111
 
 label   .fill   xFE12
 
-btnstr  .FILL   x0053
-        .FILL   x0070
-        .FILL   x0069
-        .FILL   x006E
-        .FILL   x0020
-        .FILL   x0077
-        .FILL   x0068
-        .FILL   x0065
-        .FILL   x0065
-        .FILL   x006C
-        .FILL   x003F
-        .FILL   x0000
+tal     .FILL   #-48
+
+
 hop2
 halt
 
