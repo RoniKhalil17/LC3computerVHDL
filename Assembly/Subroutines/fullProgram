@@ -140,7 +140,7 @@ ADD R5  R5  R1
 brnzp hop1 ;;skal hoppe et andet sted hen
 
 
-hop1
+
 ;DIV .FILL #27
 
 ;MOD .FILL #4
@@ -148,15 +148,37 @@ hop1
 ;; min ide til hvordan vi gør det "random" er at jeg vil tage random tallet og også gøre det til en counter, som styrer loopet. Ellers hvis loopet konstant er 10
 ;; så kommer tallene til at føles meget predictable, samtidig har vi stadig lidt et problem, hvis man kører spillet mere end en gang, men måske kan vi fikse det ved at gøre
 ; værdierne a, X, c og M til et tal vi vælger inden spil start?
-
-;;Wheel Subroutine
-
+hop1
+;;----Button----;;
+;;R5 er reserveret indtil efter wheel er kørt
 AND R0  R0  #0
 AND R1  R1  #0
 AND R2  R2  #0
 AND R3  R3  #0
 AND R4  R4  #0
-AND R5  R5  #0
+AND R6  R6  #0
+
+LEA R1  btnstr
+
+strloop
+LDR R0  R1  #0
+BRz click
+PUTS
+ADD R1  R1  #1
+BR strloop
+
+
+
+
+
+;;Wheel Subroutine
+click
+AND R0  R0  #0
+AND R1  R1  #0
+AND R2  R2  #0
+AND R3  R3  #0
+AND R4  R4  #0
+AND R6  R6  #0
 
 
 ADD R1  R1  #10
@@ -171,7 +193,7 @@ LDR R0  R0  #0
 
 arrloop
 
-LD R5   teller ;;værdi 2 til tæller
+LD R6   teller ;;værdi 2 til tæller
 tellerloop
 
 LD R4   sekund ;;værdi 1 til tæller
@@ -181,7 +203,7 @@ tickloop
 
 ADD R4  R4  #-1
 BRp tickloop
-ADD R5  R5  #-1
+ADD R6  R6  #-1
 BRp tellerloop
 
 STI R0  label
@@ -213,6 +235,19 @@ sekund  .FILL   #8000
 teller  .FILL   #1111
 
 label   .fill   xFE12
+
+btnstr  .FILL   x0053
+        .FILL   x0070
+        .FILL   x0069
+        .FILL   x006E
+        .FILL   x0020
+        .FILL   x0077
+        .FILL   x0068
+        .FILL   x0065
+        .FILL   x0065
+        .FILL   x006C
+        .FILL   x003F
+        .FILL   x0000
 hop2
 halt
 
