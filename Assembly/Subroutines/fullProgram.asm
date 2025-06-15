@@ -2,6 +2,10 @@
 
 newgame
 
+AND R0  R0  #0
+
+ST  R0  bet
+
 createplayer
 and r3, r3, #0  ;nulstiller r3.
 add r3, r3, #3 ; antal spiller.
@@ -187,10 +191,6 @@ IN
 
 LD  R1  tal
 
-NOT R1  R1  
-
-ADD R1  R1  #1
-
 ADD R0  R0  R1
 
 ST  R0  betnumber
@@ -207,7 +207,7 @@ teller  .FILL   #111
 
 label   .fill   xFE12
 
-tal     .FILL   #48
+tal     .FILL   #-48
 
 bet     .FILL   #0
 
@@ -246,10 +246,6 @@ AND R0  R0  #0
 IN
 
 LD  R1  tal
-
-NOT R1  R1  
-
-ADD R1  R1  #1
 
 ADD R0  R0  R1
 
@@ -334,7 +330,7 @@ multiloop
 ADD R1  R1  R3
 ADD R2  R2  #-1
 BRp multiloop
-BRz addscore
+BRnz addscore
 ;;--ADD CURRENCY TO SCORE--;;
 ;;Nuværende vigtige register er R1
 addscore
@@ -367,6 +363,8 @@ AND R2  R2  #0
 AND R3  R3  #0
 AND R4  R4  #0
 AND R6  R6  #0
+
+;;--Tjek for at se om spillet skal fortsætte--;;
 
 IN
 
