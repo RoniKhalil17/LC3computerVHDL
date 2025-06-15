@@ -149,6 +149,47 @@ brnzp hop1 ;;skal hoppe et andet sted hen
 ;; så kommer tallene til at føles meget predictable, samtidig har vi stadig lidt et problem, hvis man kører spillet mere end en gang, men måske kan vi fikse det ved at gøre
 ; værdierne a, X, c og M til et tal vi vælger inden spil start?
 hop1
+;;----BET----;;
+
+AND R0  R0  #0
+AND R1  R1  #0
+AND R2  R2  #0
+AND R3  R3  #0
+AND R4  R4  #0
+AND R6  R6  #0
+
+LEA R0  betstr
+
+PUTS
+
+AND R0  R0  #0
+
+LD  R1  startMoney
+
+IN
+
+LD  R2  tal
+
+ADD R0  R0  R2 ;; tal som bliver bettet
+
+ST  R0  bet
+
+;;Hvilket tal vil du bette på?
+LEA R0  numbet
+
+PUTS
+
+AND R0  R0  #0
+
+IN
+
+LD  R1  tal
+
+ADD R0  R0  R1
+
+ST  R0  betnumber
+
+
 ;;----Button----;;
 ;;R5 er reserveret indtil efter wheel er kørt
 
@@ -222,6 +263,13 @@ BRp arrloop
 
 BRZ hop2
 
+;;--WINMULTIPLYER--;;
+
+
+
+betstr  .STRINGZ "How much do you wish to bet?"
+
+numbet  .STRINGZ "Which number do you wish to bet on?"
 
 btnstr  .STRINGZ "Press 1 to spin wheel"
 
@@ -239,13 +287,17 @@ Hjul    .FILL   x0001
 
 
 
-sekund  .FILL   #8000
+sekund  .FILL   #800
 
-teller  .FILL   #1111
+teller  .FILL   #111
 
 label   .fill   xFE12
 
 tal     .FILL   #-48
+
+bet     .FILL   x4000
+
+betnumber .FILL x4001
 
 
 hop2
