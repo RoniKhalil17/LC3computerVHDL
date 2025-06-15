@@ -269,7 +269,7 @@ BRZ hop2
 ;;--WINMULTIPLYER--;;
 ;; R0 og R2 er reserveret værdier, som holder, henholdsvis hjultal og bet tal.
 hop2
-ADD R0  R0  #-1
+ADD R0  R0  #-2
 
 NOT R2  R2  
 
@@ -284,19 +284,29 @@ wonbet
 ;; multiply by x factor
 LEA R0  winstr
 
-OUT
+PUTS
 
 LD  R1  bet
 
 LD  R2  betnumber
 
-
+AND R3  R3  #0
+ADD R3  R3  R1
+ADD R2  R2  #-1
 multiloop
-ADD R1  R1  R1
+ADD R1  R1  R3
 ADD R2  R2  #-1
 BRp multiloop
-BRz restart
+BRz addscore
+;;--ADD CURRENCY TO SCORE--;;
+;;Nuværende vigtige register er R1
+addscore
+LD  R0  startMoney
 
+ADD R0  R0  R1
+
+ST  R0  startMoney
+BR restart
 
 
 
@@ -335,9 +345,9 @@ label   .fill   xFE12
 
 tal     .FILL   #-48
 
-bet     .FILL   x4000
+bet     .FILL   #0
 
-betnumber .FILL x4001
+betnumber .FILL #0
 
 
 restart
