@@ -1,4 +1,4 @@
-.orig x3000
+.orig x0500
 
 createplayer
 and r3, r3, #0  ;nulstiller r3.
@@ -259,7 +259,7 @@ BRp tickloop
 ADD R6  R6  #-1
 BRp tellerloop
 
-ST R0  label
+STI R0  label
 ADD R0  R0  #1
 ADD R1  R1  #-1
 BRp arrloop
@@ -337,9 +337,9 @@ Hjul    .FILL   x0001
 
 
 
-sekund  .FILL   #800
+sekund  .FILL   #8000
 
-teller  .FILL   #111
+teller  .FILL   #1111
 
 label   .fill   xFE12
 
