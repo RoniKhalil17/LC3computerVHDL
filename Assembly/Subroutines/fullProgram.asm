@@ -201,9 +201,13 @@ ADD R2  R1  #0
 brnzp continue
 
 ;;----VÆRDIER----;;
-sekund  .FILL   #1
+sekund  .FILL   #1000
 
-teller  .FILL   #1
+teller  .FILL   #1111
+
+slower  .FILL   #2000
+
+slowest .FILL   #4000
 
 label   .fill   xFE12
 
@@ -267,7 +271,8 @@ AND R4  R4  #0
 AND R6  R6  #0
 
 
-ADD R1  R1  #9
+ADD R1  R1  #10
+
 
 LEA R0  Hjul
 
@@ -278,7 +283,6 @@ LDR R0  R0  #0
 
 
 arrloop
-
 LD R6   teller ;;værdi 2 til tæller
 tellerloop
 
@@ -296,8 +300,66 @@ STI R0  label
 ADD R0  R0  #1
 ADD R1  R1  #-1
 BRp arrloop
+BR nextloop
 
-BRZ hop2
+
+
+nextloop
+LEA R0  Hjul
+
+LDR R0  R0  #0
+ADD R1  R1  #10
+
+;;--Langsommere loop--;;
+
+wheelloop2
+LD  R6  teller
+tloop2
+LD  R4  slower
+tloop3
+ADD R4  R4  #-1
+brp tloop3
+ADD R6  R6  #-1
+brp tloop2
+
+
+STI R0  label
+ADD R0  R0  #1
+ADD R1  R1  #-1
+BRp wheelloop2
+BR nextloop2
+
+
+nextloop2
+;;--Langsommest loop--;;
+ADD R1  R1  #10
+BRp continue2
+
+jump
+
+BR newgame
+
+continue2
+LEA R0  Hjul
+
+LDR R0  R0  #0
+wheelloop3
+LD  R6  teller
+tloop4
+LD  R4  slowest
+tloop5
+ADD R4  R4  #-1
+brp tloop5
+ADD R6  R6  #-1
+brp tloop4
+
+
+STI R0  label
+ADD R0  R0  #1
+ADD R1  R1  #-1
+BRp wheelloop3
+BR hop2
+
 
 ;;--WINMULTIPLYER--;;
 ;; R0 og R2 er reserveret værdier, som holder, henholdsvis hjultal og bet tal.
@@ -398,7 +460,7 @@ LD  R1  tal
 ADD R0  R0  R1
 
 ADD R0  R0  #-1
-brz newgame
+brz jump
 brnp stop
 
 
