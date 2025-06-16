@@ -201,9 +201,9 @@ ADD R2  R1  #0
 brnzp continue
 
 ;;----VÆRDIER----;;
-sekund  .FILL   #8000
+sekund  .FILL   #1
 
-teller  .FILL   #1111
+teller  .FILL   #1
 
 label   .fill   xFE12
 
@@ -267,7 +267,7 @@ AND R4  R4  #0
 AND R6  R6  #0
 
 
-ADD R1  R1  #10
+ADD R1  R1  #9
 
 LEA R0  Hjul
 
@@ -302,7 +302,9 @@ BRZ hop2
 ;;--WINMULTIPLYER--;;
 ;; R0 og R2 er reserveret værdier, som holder, henholdsvis hjultal og bet tal.
 hop2
-ADD R0  R0  #-2
+ADD R0  R0  #-1
+
+LD  R2  betnumber
 
 NOT R2  R2  
 
@@ -310,6 +312,7 @@ ADD R2  R2  #1
 
 ADD R0  R0  R2
 BRz wonbet
+BRnp lostbet
 
 
 
@@ -338,7 +341,29 @@ LD  R0  startMoney
 
 ADD R0  R0  R1
 
-ST  R0  startMoney
+STI  R0  startMoney
+BR restart
+
+lostbet
+
+LEA R0  losestr
+
+PUTS
+
+;;--Minus score--;;
+
+LD  R1  bet
+
+NOT R1  R1
+
+ADD R1  R1  #1
+
+LD  R0  startMoney
+
+ADD R0  R0  R1
+
+STI  R0  startMoney
+
 BR restart
 
 
