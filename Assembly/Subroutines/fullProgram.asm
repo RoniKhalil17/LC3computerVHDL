@@ -345,7 +345,7 @@ ST  R2  alsoStartMoney
 AND R2  R2  #0
 
 
-ADD R1  R1  #10
+LD  R1  len
 
 BR continue
 ;;----VÆRDIER----;;
@@ -385,7 +385,21 @@ Hjul    .FILL   x0001
         .FILL   x0007
         .FILL   x0008
         .FILL   x0009
-        .FILL   x10
+        .FILL   x000A ;;10
+        .FILL   X000B
+        .FILL   X000C
+        .FILL   X000D
+        .FILL   X000E
+        .FILL   X000F
+        .FILL   X0010
+        .FILL   X0011
+        .FILL   X0012 ;; 18
+        .FILL   X0013
+        .FILL   X0014
+        .FILL   X0015
+        
+len     .FILL   #21
+        
         
 continue
 
@@ -424,7 +438,7 @@ nextloop
 LEA R0  Hjul
 
 LDR R0  R0  #0
-ADD R1  R1  #10
+LD  R1  len
 
 
 ;;--Langsommere loop--;;
