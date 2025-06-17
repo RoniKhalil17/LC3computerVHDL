@@ -126,7 +126,7 @@ BRn foundstep3
 
 
 
-foundstep3 ;hvilke scenarier er dette for? 1. Hvis vores loop rammer negativ r1. 2. Hvis last check bliver negativt
+foundstep3 ;hvilke scenarier er dette for? 1. Hvis vores loop rammer negativ r1. 2. Hvis last check bliver negativt.
 NOT R2  R2
 ADD R2  R2  #1
 ADD R1  R1  R2
