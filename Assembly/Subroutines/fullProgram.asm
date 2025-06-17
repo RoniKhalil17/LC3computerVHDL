@@ -155,6 +155,7 @@ brnzp hop1 ;;skal hoppe et andet sted hen
 ;; så kommer tallene til at føles meget predictable, samtidig har vi stadig lidt et problem, hvis man kører spillet mere end en gang, men måske kan vi fikse det ved at gøre
 ; værdierne a, X, c og M til et tal vi vælger inden spil start?
 hop1
+ST  R5  pseudotal
 ;;----BET----;;
 
 AND R0  R0  #0
@@ -347,6 +348,9 @@ ADD R1  R1  #10
 
 BR continue
 ;;----VÆRDIER----;;
+
+pseudotal .FILL #0
+
 sekund  .FILL   #1000
 
 teller  .FILL   #1111
@@ -442,7 +446,7 @@ BR nextloop2
 
 nextloop2
 ;;--Langsommest loop--;;
-ADD R1  R1  #10
+LD  R1  pseudotal
 
 LEA R0  Hjul
 
