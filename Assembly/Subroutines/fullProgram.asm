@@ -126,7 +126,7 @@ BRn foundstep3
 
 
 
-foundstep3 ;hvilke scenarier er dette for? 1. Hvis vores loop rammer negativ r1. 2. Hvis last check bliver negativt.
+foundstep3 ;hvilke scenarier er dette for? 1. Hvis vores loop rammer negativ r1. 2. Hvis last check bliver negativt
 NOT R2  R2
 ADD R2  R2  #1
 ADD R1  R1  R2
@@ -237,11 +237,17 @@ ADD R3  R3  R0
 
 ADD R0  R0  R1
 
-ADD R0  R0  R3
+
 
 ST  R0  bet
 
 ;;Hvilket tal vil du bette på?
+AND R0  R0  #0
+AND R1  R1  #0
+AND R2  R2  #0
+AND R3  R3  #0
+AND R4  R4  #0
+AND R6  R6  #0
 LEA R0  numbet
 
 PUTS
@@ -265,6 +271,8 @@ brp tiloop2
 
 ADD R1  R1  R0;10
 
+AND R0  R0  #0
+
 IN
 
 ADD R0  R0  R2
@@ -275,9 +283,15 @@ ADD R3  R3  R0
 
 ADD R0  R0  R1
 
-ADD R0  R0  R3
+BR continue2
 
-ST  R0  bet
+jump
+
+BR newgame
+
+continue2
+
+ST  R0  betnumber
 
 AND R2  R2  #0
 
@@ -404,13 +418,7 @@ LEA R0  Hjul
 
 LDR R0  R0  #0
 ADD R1  R1  #10
-BRp continue2
 
-jump
-
-BR newgame
-
-continue2
 
 ;;--Langsommere loop--;;
 
