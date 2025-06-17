@@ -164,19 +164,80 @@ AND R3  R3  #0
 AND R4  R4  #0
 AND R6  R6  #0
 
+LD  R4  tusind ;Counter værdi til at gange vores in værdi med 10 for 10, 100 og 1000
+
 LEA R0  betstr
 
 PUTS
 
 AND R0  R0  #0
 
-LD  R1  startMoney
+;;LD  R1  startMoney
 
 IN
 
 LD  R2  tal
 
 ADD R0  R0  R2 ;; tal som bliver bettet
+
+ADD R3  R3  R0 ;; Register til at gange R0
+
+tusindloop
+ADD R0  R0  R3
+ADD R4  R4  #-1
+BRp tusindloop
+
+AND R3  R3  #0 ;; Reset register R3, så den kan holde multiplied værdi
+ADD R3  R3  R0 ;; Holder vores tal for 1000
+
+IN  
+
+ADD R0  R0  R2 ;; 100
+
+AND R2  R2  #0 ;; Reset R2 så jeg kan bruge det til at holde en værdi
+
+ADD R2  R2  R0  
+
+LD  R1  hundrede
+
+hundredeloop
+ADD R0  R0  R2
+ADD R1  R1  #-1
+brp hundredeloop
+
+ADD R0  R0  R3 ;; Vi har nu 1000 og 100 på en plads, mangler 10 og 1 cifret
+ADD R1  R1  R0 ;;placeholder værdi
+AND R3  R3  #0 
+AND R4  R4  #0
+
+ADD R4  R4  #9
+
+LD R2   tal
+
+IN
+
+ADD R0  R0  R2
+
+ADD R3  R3  R0;;Værdi til at gange r0
+
+tiloop
+ADD R0  R0  R3
+ADD R4  R4  #-1
+brp tiloop
+
+ADD R1  R1  R0; Holder 1000, 100 og 10
+
+IN
+
+ADD R0  R0  R2
+
+AND R3  R3  #0
+
+ADD R3  R3  R0
+
+ADD R0  R0  R1
+
+ADD R0  R0  R3
 
 ST  R0  bet
 
@@ -187,49 +248,40 @@ PUTS
 
 AND R0  R0  #0
 
+ADD R4  R4  #9
+
+LD R2   tal
+
 IN
 
-LD  R1  tal
+ADD R0  R0  R2
+
+ADD R3  R3  R0;;Værdi til at gange r0
+
+tiloop2
+ADD R0  R0  R3
+ADD R4  R4  #-1
+brp tiloop2
+
+ADD R1  R1  R0;10
+
+IN
+
+ADD R0  R0  R2
+
+AND R3  R3  #0
+
+ADD R3  R3  R0
 
 ADD R0  R0  R1
 
-ST  R0  betnumber
+ADD R0  R0  R3
+
+ST  R0  bet
 
 AND R2  R2  #0
 
 ADD R2  R1  #0
-brnzp continue
-
-;;----VÆRDIER----;;
-sekund  .FILL   #1000
-
-teller  .FILL   #1111
-
-slower  .FILL   #2000
-
-slowest .FILL   #4000
-
-label   .fill   xFE12
-
-tal     .FILL   #-48
-
-bet     .FILL   #0
-
-betnumber .FILL #0
-
-Hjul    .FILL   x0001
-        .FILL   x0002
-        .FILL   x0003
-        .FILL   x0004
-        .FILL   x0005
-        .FILL   x0006
-        .FILL   x0007
-        .FILL   x0008
-        .FILL   x0009
-        .FILL   x10
-
-continue
-
 
 ;;----Button----;;
 ;;R5 er reserveret indtil efter wheel er kørt
@@ -270,8 +322,51 @@ AND R3  R3  #0
 AND R4  R4  #0
 AND R6  R6  #0
 
+LD  R2  startMoney
+
+ST  R2  alsoStartMoney
+
+AND R2  R2  #0
+
 
 ADD R1  R1  #10
+
+BR continue
+;;----VÆRDIER----;;
+sekund  .FILL   #1000
+
+teller  .FILL   #1111
+
+slower  .FILL   #2000
+
+slowest .FILL   #4000
+
+label   .fill   xFE12
+
+tal     .FILL   #-48
+
+bet     .FILL   #0
+
+betnumber .FILL #0
+
+tusind  .FILL   #999
+
+hundrede .FILL  #99
+
+alsoStartMoney  .FILL   #0
+
+Hjul    .FILL   x0001
+        .FILL   x0002
+        .FILL   x0003
+        .FILL   x0004
+        .FILL   x0005
+        .FILL   x0006
+        .FILL   x0007
+        .FILL   x0008
+        .FILL   x0009
+        .FILL   x10
+        
+continue
 
 
 LEA R0  Hjul
@@ -309,6 +404,13 @@ LEA R0  Hjul
 
 LDR R0  R0  #0
 ADD R1  R1  #10
+BRp continue2
+
+jump
+
+BR newgame
+
+continue2
 
 ;;--Langsommere loop--;;
 
@@ -333,13 +435,7 @@ BR nextloop2
 nextloop2
 ;;--Langsommest loop--;;
 ADD R1  R1  #10
-BRp continue2
 
-jump
-
-BR newgame
-
-continue2
 LEA R0  Hjul
 
 LDR R0  R0  #0
@@ -399,11 +495,11 @@ BRnz addscore
 ;;--ADD CURRENCY TO SCORE--;;
 ;;Nuværende vigtige register er R1
 addscore
-LD  R0  startMoney
+LD  R0  alsoStartMoney
 
 ADD R0  R0  R1
 
-STI  R0  startMoney
+STI  R0  alsoStartMoney
 BR restart
 
 lostbet
@@ -420,11 +516,11 @@ NOT R1  R1
 
 ADD R1  R1  #1
 
-LD  R0  startMoney
+LD  R0  alsoStartMoney
 
 ADD R0  R0  R1
 
-STI  R0  startMoney
+STI  R0  alsoStartMoney
 
 BR restart
 
