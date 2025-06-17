@@ -60,7 +60,7 @@ AND R5  R5  #0 ;Værdi til at holde a*X_n
 ; så vi skal udregne (R2*R1+R3) og så store det i et register, bruge JSR til at køre modulus subroutine og så får vi 1 tal tilbage
 ; Så kan vi bruge det tal til at køre det hele igen
 ; Jeg har brugt chat til at finde et sæt tal, som opfylder kraven for læresætningen
-ADD R1  R1  #3
+LD  R1  looppseudotal
 ADD R2  R2  #5
 ADD R3  R3  #5
 ADD R4  R4  #15
@@ -155,6 +155,7 @@ brnzp hop1 ;;skal hoppe et andet sted hen
 ;; så kommer tallene til at føles meget predictable, samtidig har vi stadig lidt et problem, hvis man kører spillet mere end en gang, men måske kan vi fikse det ved at gøre
 ; værdierne a, X, c og M til et tal vi vælger inden spil start?
 hop1
+ST  R5  looppseudotal
 ST  R5  pseudotal
 ;;----BET----;;
 
@@ -348,6 +349,8 @@ ADD R1  R1  #10
 
 BR continue
 ;;----VÆRDIER----;;
+
+looppseudotal .FILL #3
 
 pseudotal .FILL #0
 
