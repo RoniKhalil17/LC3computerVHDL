@@ -43,9 +43,7 @@ brp nySpiller
 ;;halt    ;er ikke done men det er en start
 startMoney .fill #300   ;er bare et eksempel på man kan start med penge
 tilTal       .fill #-48
-player1  .blkw #5  ; indholder 4 til navn, 1 til holde score, 10 til at indholde historik en til null termintor og buffer.
-player2  .blkw #5
-player3  .blkw #5
+
 
 ;;PseudoRandom 
 done
@@ -227,6 +225,7 @@ LEA R0  numbet
 PUTS
 
 AND R0  R0  #0
+
 
 ADD R4  R4  #9
 
@@ -434,6 +433,11 @@ brnzp hop1 ;;skal hoppe et andet sted hen
 
 hop1
 ST  R5  RNG_SEED
+BR playrarr
+player1  .blkw #5  ; indholder 4 til navn, 1 til holde score, 10 til at indholde historik en til null termintor og buffer.
+player2  .blkw #5
+player3  .blkw #5
+playrarr
 
 
 ;;Wheel Subroutine
@@ -536,6 +540,8 @@ speedinc    .FILL   #400
 
 delaycount  .FILL   #600
 
+lastsave    .FILL   #0
+
 jump2
 BR jump
         
@@ -575,7 +581,7 @@ LD  R3  RNG_SEED ;; tallet bliver valgt af RNG seed/modulus af (a*RNG_seed+c)
 FinalLoop
 LDR R0  R5  #0
 STI R0  SSEG
-
+ST  R0  lastsave
 LD  R2  DelayCount ;; delay er det samme som før
 FinalDelayRepeat
 ADD R7  R4  #0
@@ -591,106 +597,163 @@ ADD R5  R5  #1
 ADD R3  R3 #-1
 BRp FinalLoop
 
-BR hop2
 
+;; Eksempel: Indsæt nogle værdier (én ad gangen)
+LD  R0  lastsave
+JSR INSERT_NEW
+
+ADD R0, R0, #1
+JSR INSERT_NEW
+
+ADD R0, R0, #2
+JSR INSERT_NEW
+
+BR leavefifo
+
+;HALT
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; SUBROUTINE: INSERT_NEW
+;; Input: R0 = ny værdi som skal i array[0]
+;; Skubber alle værdier nedad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+INSERT_NEW
+    ST R1, save1
+    ST R2, save2
+    ST R3, save3
+
+    LEA R1, buffer      ; R1 -> start af array
+    LD  R2, arrlen      ; R2 = 10 (længde)
+    ADD R2, R2, #-2     ; Sidste index at flytte: 8 (første bliver overskrevet)
+    
+shift_loop
+    ADD R3, R1, R2      ; R3 = &buffer[i]
+    LDR R4, R3, #0      ; R4 = buffer[i]
+    ADD R3, R3, #1      ; R3 = &buffer[i+1]
+    STR R4, R3, #0      ; buffer[i+1] = buffer[i]
+
+    ADD R2, R2, #-1
+    BRzp shift_loop
+
+    ;; Gem ny værdi i buffer[0]
+    LEA R1, buffer
+    STR R0, R1, #0
+
+    ;; Restore og return
+    LD R1, save1
+    LD R2, save2
+    LD R3, save3
+    RET
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DATA
+arrlen .FILL #10
+buffer .BLKW #10
+
+save1  .BLKW #1
+save2  .BLKW #1
+save3  .BLKW #1
+
+
+leavefifo
+
+BR hop2
 
 
 ;;--WINMULTIPLYER--;;
 ;; R0 og R2 er reserveret værdier, som holder, henholdsvis hjultal og bet tal.
 hop2
 
-LD R1 tempcount
 
+;;--PLAYER1--;;
+LEA R0  player1winloss
+PUTS
+AND R0  R0  #0
 
-checkwinplayer
-
-ADD R1  R1  #-2
-BRZ player2wincon
-BRN player1wincon
-BRp  player3wincon
-
-
-player1wincon
 LD  R2  betnumber1
-BR skipnext
+LD  R1  bet1
+LEA R3  player1
 
+LDR R4  R3  #4 ;; Værdi af spillers 'pung'
+JSR winloss1
+BR winlossplayer2
 
+;;--PLAYER2--;;
+winlossplayer2
+LEA R0  player2winloss
+PUTS
+AND R0  R0  #0
 
-player2wincon
 LD  R2  betnumber2
-BR skipnext
+LD  R1  bet2
+LEA R3  player2
 
-player3wincon
+LDR R4  R3  #4 ;; Værdi af spillers 'pung'
+JSR winloss2
+BR winlossplayer3
+
+;;--PLAYER3--;;
+winlossplayer3
+LEA R0  player3winloss
+PUTS
+AND R0  R0  #0
+
 LD  R2  betnumber3
-LD  R5  tempcount
-ADD R5  R5  #-1
-ST  R5  tempcount
 
+LD  R1  bet3
 
-skipnext
-NOT R2  R2  
+LEA R3  player3
 
-ADD R2  R2  #1
+LDR R4  R3  #4 ;; Værdi af spillers 'pung'
+JSR winloss3
+BR restart
 
-ADD R0  R0  R2
+winloss1
+winloss2
+winloss3
+ST R7, SAVE2_R7
+AND R5  R5  #0
+
+ADD R5  R2  #0 ;;Kopi af spillers betnumber
+
+NOT R5  R5  
+
+ADD R5  R5  #1
+
+ADD R0  R0  R5
 BRz wonbet
 BRnp lostbet
 
-
-
-wonbet
 ;; multiply by x factor
-
-multiplyagain
-
+wonbet
 LEA R0  winstr
 
 PUTS
 
-LD  R6  tempcount
+;LD  R1  bet -- burde ligge i spillerens egen del
 
-ADD R6  R6  #-2
-BRZ player2wincon2
-BRN player1wincon2
-BRp  player3wincon2
+;LD  R2  betnumber - samme som bet
 
-player1wincon2
-LD  R2  betnumber1
-BR skipnext2
-
-
-player2wincon2
-LD  R2  betnumber2
-BR skipnext2
-
-player3wincon2
-LD  R2  betnumber3
-LD  R5  tempcount
+AND R6  R6  #0
+ADD R6  R6  R1
 ADD R5  R5  #-1
-ST  R5  tempcount
-
-LD  R1  twentyone
-
-skipnext2
-AND R3  R3  #0
-ADD R3  R3  R1
-ADD R2  R2  #-1
 multiloop
-ADD R1  R1  R3
-ADD R2  R2  #-1
+ADD R1  R1  R6
+ADD R5  R5  #-1
 BRp multiloop
 BRnz addscore
 ;;--ADD CURRENCY TO SCORE--;;
 ;;Nuværende vigtige register er R1
 addscore
-LD  R0  alsoStartMoney
 
-ADD R0  R0  R1
+ADD R1  R1  R4
 
-STI  R0  alsoStartMoney
-ADD R6  R6  #0
-BRp multiplyagain
-BRnz restart
+STR  R1 R4  #4 
+
+LD R7, SAVE2_R7
+RET
+
+BR restart
 
 lostbet
 
@@ -700,41 +763,24 @@ PUTS
 
 ;;--Minus score--;;
 
-LD  R6  tempcount
+;;LD  R1  bet
 
-ADD R6  R6  #-2
-BRZ player2wincon3
-BRN player1wincon3
-BRp  player3wincon3
 
-player1wincon3
-LD  R2  betnumber1
-BR skipnext3
 
-player2wincon3
-LD  R2  betnumber2
-BR skipnext3
-
-player3wincon3
-LD  R2  betnumber3
-LD  R5  tempcount
-ADD R5  R5  #-1
-ST  R5  tempcount
-
-skipnext3
 NOT R1  R1
 
 ADD R1  R1  #1
 
-LD  R0  alsoStartMoney
+ADD R0  R4  #4
 
 ADD R0  R0  R1
 
-STI  R0  alsoStartMoney
+STR R0  R3  #4
 
-ADD R5  R5  #0
-BRz multiplyagain
-BRnz restart
+LD R7, SAVE2_R7
+RET
+
+BR restart
 
 
 
@@ -787,6 +833,11 @@ yes     .STRINGZ "If yes, press 1! "
 
 no      .STRINGZ "If no, press any other button! "
 
+SAVE2_R7 .BLKW 1      ; Plads til at gemme R7
+
+player1winloss  .STRINGZ    "Checking player 1 win/loss\n"
+player2winloss  .STRINGZ    "Checking player 2 win/loss\n"
+player3winloss  .STRINGZ    "Checking player 3 win/loss\n"
 
 
 
