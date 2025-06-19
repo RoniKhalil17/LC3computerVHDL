@@ -536,9 +536,9 @@ RNG_SEED2   .FILL   #0
 
 loopcounter .FILL   #800
 
-speedinc    .FILL   #400
+speedinc    .FILL   #20 ;;400
 
-delaycount  .FILL   #600
+delaycount  .FILL   #50 ;; 600
 
 lastsave    .FILL   #0
 
@@ -581,7 +581,6 @@ LD  R3  RNG_SEED ;; tallet bliver valgt af RNG seed/modulus af (a*RNG_seed+c)
 FinalLoop
 LDR R0  R5  #0
 STI R0  SSEG
-ST  R0  lastsave
 LD  R2  DelayCount ;; delay er det samme som før
 FinalDelayRepeat
 ADD R7  R4  #0
@@ -596,6 +595,8 @@ BRp FinalDelayRepeat
 ADD R5  R5  #1
 ADD R3  R3 #-1
 BRp FinalLoop
+
+ST  R0  lastsave
 
 
 ;; Eksempel: Indsæt nogle værdier (én ad gangen)
@@ -719,6 +720,8 @@ ADD R5  R2  #0 ;;Kopi af spillers betnumber
 NOT R5  R5  
 
 ADD R5  R5  #1
+
+LD  R0  lastsave
 
 ADD R0  R0  R5
 BRz wonbet
