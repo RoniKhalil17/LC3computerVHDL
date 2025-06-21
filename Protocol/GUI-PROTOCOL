@@ -1,0 +1,544 @@
+import com.fazecast.jSerialComm.SerialPort;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.io.IOException;
+
+public class GUIUART  {
+        static String player1Name = "";
+        static String player2Name = "";
+        static String player3Name = "";
+        static int player1Score = 0;
+        static int player2Score = 0;
+        static int player3Score = 0;
+        static int player1Bet = 0;
+        static int player2Bet = 0;
+        static int player3Bet = 0;
+        static char player1color = ' ';
+        static char player2color = ' ';
+        static char player3color = ' ';
+        static int player1Num = 0;
+        static int player2Num = 0;
+        static int player3Num = 0;
+        static int WheelValue = 1; // Value of the wheel, can be used to update the GUI with the latest value
+        static int[] history = new int[10]; // Array to hold the last 10 values of the wheel
+        static JLabel playerNameLabel = new JLabel("Player 1: "+ player1Name);
+        static JLabel playerScoreLabel = new JLabel("Saldo: "+ player1Score);
+        static JLabel player1BetlLabel = new JLabel("Bet: "+ player1Bet);
+        static JLabel player1colorLabel = new JLabel("Color: "+ player1color);
+        static JLabel player1NumLabel = new JLabel("Number: "+ player1Num);
+
+        static JLabel player2NameLabel = new JLabel("Player 2: "+ player2Name);
+        static JLabel player2ScoreLabel = new JLabel("Saldo: "+ player2Score);
+        static JLabel player2BetLabel = new JLabel("Bet: "+ player2Bet);
+        static JLabel player2colorLabel = new JLabel("Color: "+ player2color);
+        static JLabel player2NumLabel = new JLabel("Number: "+ player2Num);
+
+        static JLabel player3NameLabel = new JLabel("Player 3: "+ player3Name);
+        static JLabel player3ScoreLabel = new JLabel("Saldo: "+ player3Score);
+        static JLabel player3BetLabel = new JLabel("Bet: "+ player3Bet);
+        static JLabel player3colorLabel = new JLabel("Color: "+ player3color);
+        static JLabel player3NumLabel = new JLabel("Number: "+ player3Num);
+
+        static JLabel historyLabel1 = new JLabel("History: "+ history[0]);
+        static JLabel historyLabel2 = new JLabel("History: " + history[1]);
+        static JLabel historyLabel3 = new JLabel("History: "+ history[2]);
+        static JLabel historyLabel4 = new JLabel("History: "+ history[3]);
+        static JLabel historyLabel5 = new JLabel("History: "+ history[4]);
+        static JLabel historyLabel6 = new JLabel("History: "+ history[5]);
+        static JLabel historyLabel7 = new JLabel("History: "+ history[6]);
+        static JLabel historyLabel8 = new JLabel("History: "+ history[7]);
+        static JLabel historyLabel9 = new JLabel("History: "+ history[8]);
+        static JLabel historyLabel10 = new JLabel("History: "+ history[9]);
+        private static int rotationOffset = 0; // Offset for rotating the wheel
+
+
+        private static final byte HEADER = (byte) 0x3F;
+        private static final byte STOP_BYTE = (byte) 0x76;
+
+    public static void main(String[] args) {
+
+        // This is a placeholder for the GUI application.
+            // You can implement your GUI logic here using Java Swing or JavaFX.
+            System.out.println("GUI application started.");
+    
+            JFrame frame = new JFrame("Money wheel"); // navn på vindue
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(1000, 800);
+            frame.setLayout(null); // Disable layout manager for absolute positioning
+            frame.setVisible(true);
+    
+            frame.getContentPane().setBackground(new Color(40, 90, 30)); // baggrund farve grøn
+            
+            // Create a panel for Player 1
+            JPanel player1Box = new JPanel();
+            frame.add(player1Box); // Add the panel to the frame
+            player1Box.setBounds(100, 100, 200, 80); 
+            player1Box.setBackground(Color.WHITE); 
+            player1Box.setBorder(new LineBorder(Color.BLACK, 2));
+            player1Box.setLayout(new GridLayout(3, 2)); 
+    
+        player1Box.add(playerNameLabel); // tilføj player name label til grid
+        player1Box.add(playerScoreLabel); // tilføj player score label til grid
+        player1Box.add(player1BetlLabel); // tilføj player bet label til grid
+        player1Box.add(player1colorLabel); // tilføj player bet label til grid
+        player1Box.add(player1NumLabel); // tilføj player bet label til grid
+        // Create a panel for Player 2
+        JPanel player2Box = new JPanel();
+        frame.add(player2Box); // Add the panel to the frame
+        player2Box.setBounds(350, 100, 200, 80);
+        player2Box.setBackground(Color.WHITE); 
+        player2Box.setBorder(new LineBorder(Color.BLACK, 2)); 
+        player2Box.setLayout(new GridLayout(3, 2)); 
+
+
+        player2Box.add(player2NameLabel); 
+        player2Box.add(player2ScoreLabel); 
+        player2Box.add(player2BetLabel); 
+        player2Box.add(player2colorLabel); // tilføj player bet label til grid
+        player2Box.add(player2NumLabel); // tilføj player bet label til grid
+        // player 3
+        JPanel player3Box = new JPanel();
+        frame.add(player3Box); 
+        player3Box.setBounds(600, 100, 200, 80); 
+        player3Box.setBackground(Color.WHITE); 
+        player3Box.setBorder(new LineBorder(Color.BLACK, 2)); // 2px black border
+        player3Box.setLayout(new GridLayout(3, 2)); 
+        
+        
+        player3Box.add(player3NameLabel); 
+        player3Box.add(player3ScoreLabel); 
+        player3Box.add(player3BetLabel); 
+        player3Box.add(player3colorLabel); // tilføj player bet label til grid
+        player3Box.add(player3NumLabel); // tilføj player bet label til grid
+
+        // historik box til hjulet værdier
+        JPanel historyBox = new JPanel();
+        frame.add(historyBox); // Add the panel to the frame
+        historyBox.setBounds(100, 250, 100, 300); // Set position and size of the box
+        historyBox.setBackground(Color.WHITE); // Set the background color of the box to yellow
+        historyBox.setBorder(new LineBorder(Color.BLACK, 2)); // 2px black border
+        historyBox.setLayout(new GridLayout(11, 1)); // 10 rows, 1 column
+        historyBox.add(historyLabel1); // Add history label to the grid
+        historyBox.add(historyLabel2); // Add history label to the grid
+        historyBox.add(historyLabel3); // Add history label to the grid
+        historyBox.add(historyLabel4); // Add history label to the grid
+        historyBox.add(historyLabel5); // Add history label to the grid
+        historyBox.add(historyLabel6); // Add history label to the grid
+        historyBox.add(historyLabel7); // Add history label to the grid
+        historyBox.add(historyLabel8); // Add history label to the grid
+        historyBox.add(historyLabel9); // Add history label to the grid
+        historyBox.add(historyLabel10); // Add history label to the grid
+
+        // 
+
+        // wheel
+        JPanel circlePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                int i = 0;
+                int wheelHeight = 500, wheelWidth = 500;
+                int centerX = 50 + wheelWidth / 2;
+                int centerY = 50 + wheelHeight / 2;
+                int radius = wheelWidth / 2 - 40;
+                Font font = new Font("Arial", Font.BOLD, 16);
+                g2d.setFont(font);
+
+                // Draw arcs with rotationOffset applied
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 1);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 2);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 3);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 4);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 5);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 6);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 7);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 8);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 9);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,10);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,11);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,12);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,13);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,14);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,15);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,16);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,17);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,18);  i += 17;
+                drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,19);  i += 17;
+                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,20);  i += 17;
+                drawSegment(g2d, Color.GREEN,wheelWidth, wheelHeight, i + rotationOffset, 20, centerX, centerY, radius,21);
+                g2d.setColor(Color.BLACK);
+
+                // Draw vertical line from (100, 60) to (100, 100)
+                g2d.setColor(Color.WHITE);
+                int xValue= 276;
+                int[] xPoints = { xValue, xValue+40, xValue+20 };
+                int[] yPoints = { 10, 10, 75 };
+                g2d.fillPolygon(xPoints, yPoints, 3);
+            }
+        };
+        circlePanel.setBounds(200, 180, 1000, 1000);
+        circlePanel.setBackground(new Color(40, 90, 30));
+        frame.add(circlePanel);
+
+        frame.setVisible(true);
+        //
+
+        //
+        SerialPort comPort = SerialPort.getCommPort("COM4");
+        comPort.setComPortParameters(115200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+        comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
+
+        if (!comPort.openPort()) {
+            System.out.println("Failed to open port.");
+            return;
+        }
+
+        System.out.println("Port opened successfully.");
+
+        byte[] buffer = new byte[2]; // Just header + type
+
+        while (true) {
+            byte[] headerBuf = new byte[1];
+            int read = comPort.readBytes(headerBuf, 1);
+
+            if (read < 1) continue;
+
+            // Wait for header
+            if (headerBuf[0] != HEADER) {
+                System.out.println("Invalid header: " + String.format("0x%02X", headerBuf[0]));
+                continue;
+            }
+
+            // Header matched; now read type byte
+            byte[] typeBuf = new byte[1];
+            if (comPort.readBytes(typeBuf, 1) < 1) continue;
+            byte type = typeBuf[0];
+
+            byte[] payload = new byte[12];  // maximum expected size
+            int expectedLength = 0;
+
+            switch (type) {
+                case (byte) 0x88:   //player data
+                case (byte) 0x89:
+                case (byte) 0x87:
+                    expectedLength = 6; // 3 name + 1 filler + 2 bytes balance
+                    break;
+                case (byte) 0x66:   //player bets
+                case (byte) 0x67:
+                case (byte) 0x68:
+                    expectedLength = 2; // 2 bytes for bet amount
+                    break;
+                case (byte) 0x61:   //player color
+                case (byte) 0x62:
+                case (byte) 0x63:
+                    expectedLength = 1; // 1 bytes for color amount
+                    break;
+                case (byte) 0x71:   //player number bet
+                case (byte) 0x72:
+                case (byte) 0x73:
+                    expectedLength = 1;
+                    break;
+                case (byte) 0x51:
+                    expectedLength = 10;
+                    break;
+                case (byte) 0x99:   //wheel
+                    handleWheel(comPort, circlePanel);
+                    continue;
+                default:
+                    System.out.println("Unknown type: " + String.format("0x%02X", type));
+                    continue;
+            }
+
+            int totalRead = comPort.readBytes(payload, expectedLength);
+            if (totalRead < expectedLength) {
+                System.out.println("Incomplete payload for type: " + String.format("0x%02X", type));
+                continue;
+            }
+
+            byte[] fullMessage = new byte[2 + expectedLength];
+            fullMessage[0] = HEADER;
+            fullMessage[1] = type;
+            System.arraycopy(payload, 0, fullMessage, 2, expectedLength);
+
+            switch (type) {
+                case (byte) 0x88: handlePlayerData(fullMessage, 1); break;
+                case (byte) 0x89: handlePlayerData(fullMessage, 2); break;
+                case (byte) 0x87: handlePlayerData(fullMessage, 3); break;
+                case (byte) 0x66: handleBet(fullMessage, 1); break;
+                case (byte) 0x67: handleBet(fullMessage, 2); break;
+                case (byte) 0x68: handleBet(fullMessage, 3); break;
+                case (byte) 0x61: handleColor(fullMessage, 1); break;
+                case (byte) 0x62: handleColor(fullMessage, 2); break;
+                case (byte) 0x63: handleColor(fullMessage, 3); break;
+                case (byte) 0x71: handleNum(fullMessage, 1); break;
+                case (byte) 0x72: handleNum(fullMessage, 2); break;
+                case (byte) 0x73: handleNum(fullMessage, 3); break;
+                case (byte) 0x51: handleHistoric(fullMessage);
+            }
+        }
+
+    }
+
+    private static void handlePlayerData(byte[] buffer, int playerId) {
+        if (buffer.length < 8) return;
+
+        char name1 = (char) buffer[2];
+        char name2 = (char) buffer[3];
+        char name3 = (char) buffer[4];
+        String name = "" + name1 + name2 + name3;
+
+        int balance = ((buffer[7] & 0xFF) << 8) | (buffer[6] & 0xFF);
+
+        switch (playerId) {
+            case 1:
+                GUIUART.player1Name = name;
+                GUIUART.player1Score = balance;
+                break;
+            case 2:
+                GUIUART.player2Name = name;
+                GUIUART.player2Score = balance;
+                break;
+            case 3:
+                GUIUART.player3Name = name;
+                GUIUART.player3Score = balance;
+                break;
+        }
+
+        System.out.printf("Player %d Name: %s, Balance: %d%n", playerId, name, balance);
+        updatePlayerName(GUIUART.player1Name, GUIUART.player2Name, GUIUART.player3Name);
+        updateSaldo(GUIUART.player1Score, GUIUART.player2Score, GUIUART.player3Score);
+    }
+
+    private static void handleBet(byte[] buffer, int playerId) {
+        if (buffer.length < 4) return;
+
+        int betAmount = ((buffer[3] & 0xFF) << 8) | (buffer[2] & 0xFF);
+
+        switch (playerId) {
+            case 1: GUIUART.player1Bet = betAmount; break;
+            case 2: GUIUART.player2Bet = betAmount; break;
+            case 3: GUIUART.player3Bet = betAmount; break;
+        }
+
+        System.out.printf("Player %d Bet: %d%n", playerId, betAmount);
+        updatePlayerBet(GUIUART.player1Bet, GUIUART.player2Bet, GUIUART.player3Bet);
+    }
+
+    private static void handleColor(byte[] buffer, int playerId) {
+        if (buffer.length < 3) return;
+
+        char color = (char) buffer[2];
+
+        switch (playerId) {
+            case 1: GUIUART.player1color = color; break;
+            case 2: GUIUART.player2color = color; break;
+            case 3: GUIUART.player3color = color; break;
+        }
+
+        System.out.printf("Player %d color: %c%n", playerId, color);
+        updatePlayerColor(GUIUART.player1color, GUIUART.player2color, GUIUART.player3color);
+    }
+
+    private static void handleNum(byte[] buffer, int playerId) {
+        if (buffer.length < 3) return;
+
+        int betNum = (int) buffer[2];
+
+        switch (playerId) {
+            case 1: GUIUART.player1Num = betNum; break;
+            case 2: GUIUART.player2Num = betNum; break;
+            case 3: GUIUART.player3Num = betNum; break;
+        }
+
+        System.out.printf("Player %d Number: %d%n", playerId, betNum);
+        updatePlayerNum(GUIUART.player1Num, GUIUART.player2Num, GUIUART.player3Num);
+    }
+
+    private static void handleHistoric(byte[] buffer) {
+        if (buffer.length < 12) return;
+
+        int h1 = (int) buffer[2];
+        int h2 = (int) buffer[3];
+        int h3 = (int) buffer[4];
+        int h4 = (int) buffer[5];
+        int h5 = (int) buffer[6];
+        int h6 = (int) buffer[7];
+        int h7 = (int) buffer[8];
+        int h8 = (int) buffer[9];
+        int h9 = (int) buffer[10];
+        int h10 = (int) buffer[11];
+
+        System.out.println("Updating wheel historic");
+
+        updateHistory(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10);
+    }
+
+    private static void handleWheel(SerialPort comPort, JPanel circlePanel) {
+        System.out.println("Wheel spin started");
+
+        while (true) {
+            byte[] singleByte = new byte[1];
+            int read = comPort.readBytes(singleByte, 1);
+
+            if (read > 0) {
+                int val = singleByte[0] & 0xFF;
+
+                if (val == STOP_BYTE) {
+                    System.out.println("Wheel spin ended.");
+                    break;
+                }
+
+                System.out.println("Wheel Value: " + val);
+                rotateToNumber(val, circlePanel);
+
+                /* 
+                // Optional: Simulate smooth animation delay
+                try {
+                    Thread.sleep(50); // adjust timing as needed
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }*/
+            }
+        }
+    }
+
+  static void updateSaldo(int score1, int score2, int score3) {
+                GUIUART.player1Score = score1; // Example score update
+                GUIUART.player2Score = score2; // Example score update
+                GUIUART.player3Score = score3; // Example score update
+                playerScoreLabel.setText("Saldo: " + player1Score);
+                player2ScoreLabel.setText("Saldo: " + player2Score);
+                player3ScoreLabel.setText("Saldo: " + player3Score);
+        
+            }
+    static void updatePlayerBet(int bet1, int bet2, int bet3) {
+                GUIUART.player1Bet = bet1; // Example bet update
+                GUIUART.player2Bet = bet2; // Example bet update
+                GUIUART.player3Bet = bet3; // Example bet update
+                player1BetlLabel.setText("Bet: " + player1Bet);
+                player2BetLabel.setText("Bet: " + player2Bet);
+                player3BetLabel.setText("Bet: " + player3Bet);
+            }
+
+    static void updatePlayerColor(char color1, char color2, char color3) {
+                GUIUART.player1color = color1; // Example bet update
+                GUIUART.player2color = color2; // Example bet update
+                GUIUART.player3color = color3; // Example bet update
+                player1colorLabel.setText("Color: " + player1color);
+                player2colorLabel.setText("Color: " + player2color);
+                player3colorLabel.setText("Color: " + player3color);
+            }
+
+    static void updatePlayerNum(int Num1, int Num2, int Num3) {
+                GUIUART.player1Num = Num1; // Example bet update
+                GUIUART.player2Num = Num2; // Example bet update
+                GUIUART.player3Num = Num3; // Example bet update
+                player1NumLabel.setText("Number: " + player1Num);
+                player2NumLabel.setText("Number: " + player2Num);
+                player3NumLabel.setText("Number: " + player3Num);
+            }        
+    static void updatePlayerName(String name1, String name2, String name3) {
+        GUIUART.player1Name = name1; // Example name update
+        GUIUART.player2Name = name2; // Example name update
+        GUIUART.player3Name = name3; // Example name update
+        playerNameLabel.setText("Player 1: " + player1Name);
+        player2NameLabel.setText("Player 2: " + player2Name);
+        player3NameLabel.setText("Player 3: " + player3Name);
+
+}
+static void updateHistory(int value1, int value2, int value3, int value4, int value5, int value6, int value7, int value8, int value9, int value10) {
+    GUIUART.history[0] = value1; // Update history values
+    GUIUART.history[1] = value2;
+    GUIUART.history[2] = value3;
+    GUIUART.history[3] = value4;
+    GUIUART.history[4] = value5;
+    GUIUART.history[5] = value6;
+    GUIUART.history[6] = value7;
+    GUIUART.history[7] = value8;
+    GUIUART.history[8] = value9;
+    GUIUART.history[9] = value10;
+    historyLabel1.setText("History: " + history[0]);
+    historyLabel2.setText("History: " + history[1]);
+    historyLabel3.setText("History: " + history[2]);
+    historyLabel4.setText("History: " + history[3]);
+    historyLabel5.setText("History: " + history[4]);
+    historyLabel6.setText("History: " + history[5]);
+    historyLabel7.setText("History: " + history[6]);
+    historyLabel8.setText("History: " + history[7]);
+    historyLabel9.setText("History: " + history[8]);
+    historyLabel10.setText("History: " + history[9]);
+}
+
+private static void drawSegment(Graphics2D g2d, Color c, int w, int h, int start, int arcSize,
+                                    int cx, int cy, int r, int number) {
+        g2d.setColor(c);
+        g2d.fillArc(50, 50, w, h, start, arcSize);
+        drawNumber(g2d, cx, cy, r, start, arcSize, number);
+    }
+
+    private static void drawNumber(Graphics2D g2d, int cx, int cy, int r, int startAngle, int arcSize, int number) {
+        double midAngle = Math.toRadians(startAngle + arcSize / 2.0);
+        int x = (int) (cx + r * Math.cos(-midAngle));
+        int y = (int) (cy + r * Math.sin(-midAngle));
+        String label = String.valueOf(number);
+        FontMetrics fm = g2d.getFontMetrics();
+        int w = fm.stringWidth(label);
+        int h = fm.getAscent();
+        g2d.setColor(Color.WHITE);
+        g2d.drawString(label, x - w / 2, y + h / 2);
+    }
+
+    // Method to rotate wheel to a given number
+    public static void rotateToNumber(int target, JPanel circle) {
+        // Each segment is 17 degrees except last which is 20.
+        // Simple approach: assume the segment for 'target' starts at (target-1)*17, except #21 is at 20 segments of 17 + 0
+        // Adjust offset so that desired segment is at angle 90
+        int anglePerSeg = (target <= 20) ? 17 : 20;
+        int desiredStart = (target <= 20) ? (target - 1) * 17 : 20 * 17;
+        // Adjust rotationOffset so that the target is at 90 degrees (or right).
+        rotationOffset = 83 - desiredStart;
+        circle.repaint();
+    }
+    public static void animateRotationToNumber(int target, JPanel circle, int durationMillis) {
+        final int startOffset = rotationOffset;
+        // Calculate target offset (same logic as rotateToNumber)
+        if (target==1) {
+            rotateToNumber(target, circle);
+        return; // No animation needed for 21, just set it directly
+        }
+        final int anglePerSeg = (target <= 20) ? 17 : 20;
+        final int desiredStart = (target <= 20) ? (target - 1) * 17 : 20 * 17;
+        final int endOffset = 83 -desiredStart;
+        
+        final int steps = 10; // Number 
+        final int delay = durationMillis / steps;
+        final int offsetDiff = endOffset - startOffset;
+    
+        Timer timer = new Timer(delay, e -> {
+            // Move rotationOffset a fraction of the total distance each tick
+            rotationOffset += offsetDiff / steps;
+            circle.repaint();
+          
+            // Stop after final step
+            if (Math.abs(rotationOffset - endOffset) < Math.abs(offsetDiff / steps)) {
+                rotationOffset = endOffset;
+                circle.repaint();
+                ((Timer) e.getSource()).stop();
+            }
+        });
+        timer.start();
+    }
+
+}
+
