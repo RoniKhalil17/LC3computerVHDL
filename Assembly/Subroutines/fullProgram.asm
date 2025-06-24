@@ -493,7 +493,8 @@ PUTS
 
 AND R0  R0  #0
 
-IN
+GETC
+OUT
 
 LD  R2  EXtal
 
@@ -509,7 +510,8 @@ BRp tusindloop
 AND R3  R3  #0 ;; Reset register R3, så den kan holde multiplied værdi
 ADD R3  R3  R0 ;; Holder vores tal for 1000
 
-IN  
+GETC
+OUT  
 
 ADD R0  R0  R2 ;; 100
 
@@ -533,7 +535,8 @@ ADD R4  R4  #9
 
 LD R2   EXtal
 
-IN
+GETC
+OUT
 
 ADD R0  R0  R2
 
@@ -546,7 +549,8 @@ brp tiloop
 
 ADD R1  R1  R0; Holder 1000, 100 og 10
 
-IN
+GETC
+OUT
 
 ADD R0  R0  R2
 
@@ -583,7 +587,8 @@ COLORBET1
 LEA R0, colorprompt1
 PUTS
 AND R0, R0, #0
-IN                 ; Read char
+GETC
+OUT                 ; Read char
 ST R0, EXTRAbetcolor1
 
 ; --- UART SEND COLOR BET ---
@@ -614,7 +619,8 @@ COLORBET2
 LEA R0, colorprompt2
 PUTS
 AND R0, R0, #0
-IN                 ; Read char
+GETC
+OUT                ; Read char
 ST R0, EXTRAbetcolor2
 
 ; --- UART SEND COLOR2 BET ---
@@ -643,7 +649,8 @@ COLORBET3
 LEA R0, colorprompt3
 PUTS
 AND R0, R0, #0
-IN                 ; Read char
+GETC
+OUT                 ; Read char
 ST R0, EXTRAbetcolor3
 
 ; --- UART SEND COLOR3 BET ---
@@ -672,9 +679,9 @@ BR wheelbetnext
 newgame4
 BR newgame5
 
-colorprompt1   .STRINGZ "\nPlayer 1, choose a color (R=Red, B=Black, G=Green): "
-colorprompt2   .STRINGZ "\nPlayer 2, choose a color (R=Red, B=Black, G=Green): "
-colorprompt3   .STRINGZ "\nPlayer 3, choose a color (R=Red, B=Black, G=Green): "
+colorprompt1   .STRINGZ "\nPlayer 1, choose a color (R=Red, B=Black, G=Green): \n"
+colorprompt2   .STRINGZ "\nPlayer 2, choose a color (R=Red, B=Black, G=Green): \n"
+colorprompt3   .STRINGZ "\nPlayer 3, choose a color (R=Red, B=Black, G=Green): \n"
 
 EXTRAbetcolor1  .FILL #0
 EXTRAbetcolor2  .FILL #0
@@ -700,9 +707,9 @@ tusind  .FILL   #999
 
 hundrede .FILL  #99
 
-wheelbet1   .STRINGZ    "Player 1, choose a number\n"
-wheelbet2   .STRINGZ    "Player 2, choose a number\n"
-wheelbet3   .STRINGZ    "Player 3, choose a number\n"
+wheelbet1   .STRINGZ    "\nPlayer 1, choose a number\n"
+wheelbet2   .STRINGZ    "\nPlayer 2, choose a number\n"
+wheelbet3   .STRINGZ    "\nPlayer 3, choose a number\n"
 
 EXTRAbetnumber1 .FILL #0
 
@@ -892,7 +899,8 @@ ADD R4  R4  #9
 
 LD R2   tal
 
-IN
+GETC
+OUT
 
 ADD R0  R0  R2
 
@@ -907,7 +915,8 @@ ADD R1  R1  R0;10
 
 AND R0  R0  #0
 
-IN
+GETC
+OUT
 
 ADD R0  R0  R2
 
@@ -1134,7 +1143,7 @@ ST  R1  kalddenwhatever
 BR continue
 ;;----VÆRDIER----;;
 
-playerbet    .STRINGZ    "How many players are betting?"
+playerbet    .STRINGZ    "\nHow many players are betting?"
 
 tempcount   .FILL   #0
 
@@ -1154,9 +1163,9 @@ SSEG   .fill   xFE12
 
 alsoStartMoney  .FILL   #0
 
-btnstr  .STRINGZ "Press button to spin wheel\n"
+btnstr  .STRINGZ "\nPress button to spin wheel\n"
 
-numbet  .STRINGZ "Which number do you wish to bet on? "
+numbet  .STRINGZ "\nWhich number do you wish to bet on? "
 
 Hjul    .FILL   x0001
         .FILL   x0002
@@ -1470,13 +1479,13 @@ JSR winloss3
 
 BR colorWINLOSS
 
-winstr  .STRINGZ "You won on number!\n"
+winstr  .STRINGZ "\nYou won on number!\n"
 
-losestr .STRINGZ "You lost on number!\n"
+losestr .STRINGZ "\nYou lost on number!\n"
 
-player1winloss  .STRINGZ    "Checking player 1 win/loss\n"
-player2winloss  .STRINGZ    "Checking player 2 win/loss\n"
-player3winloss  .STRINGZ    "Checking player 3 win/loss\n"
+player1winloss  .STRINGZ    "\nChecking player 1 win/loss\n"
+player2winloss  .STRINGZ    "\nChecking player 2 win/loss\n"
+player3winloss  .STRINGZ    "\nChecking player 3 win/loss\n"
 
 betcolor1   .FILL   EXTRAbetcolor1
 betcolor2   .FILL   EXTRAbetcolor2
@@ -1886,17 +1895,17 @@ RED   .FILL x0052 ; ASCII 'R'
 BLACK .FILL x0042 ; ASCII 'B'
 GREEN .FILL x0047 ; ASCII 'G'
 
-winstrCOLOR  .STRINGZ "You won on color!\n"
+winstrCOLOR  .STRINGZ "\nYou won on color!\n"
 
-losestrCOLOR .STRINGZ "You lost on color!\n"
+losestrCOLOR .STRINGZ "\nYou lost on color!\n"
 
-buststr .STRINGZ "You've gone bust! "
+buststr .STRINGZ "\nYou've gone bust! "
 
-repeatbet .STRINGZ "Do you want to bet again? "
+repeatbet .STRINGZ "\nDo you want to bet again? "
 
-yes     .STRINGZ "If yes, press 1! "
+yes     .STRINGZ "\nIf yes, press 1! "
 
-no      .STRINGZ "If no, press any other button! "
+no      .STRINGZ "\nIf no, press any other button! "
 
 
 stop
