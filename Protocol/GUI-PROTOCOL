@@ -3,11 +3,6 @@ import com.fazecast.jSerialComm.SerialPort;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.Timer;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -67,13 +62,18 @@ public class GUIUART  {
 
     public static void main(String[] args) {
 
-        // This is a placeholder for the GUI application.
-            // You can implement your GUI logic here using Java Swing or JavaFX.
             System.out.println("GUI application started.");
     
             JFrame frame = new JFrame("Money wheel"); // navn på vindue
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1000, 800);
+
+            ImageIcon bg = new ImageIcon("C:\\Users\\ronik\\Desktop\\IT-Elektronik\\2.Semester\\DigiCDIO\\wheelGUI\\wheelGUI\\GUIRANI.png");
+            JLabel backgroundLabel = new JLabel(bg);
+
+            backgroundLabel.setBounds(0, 0, 1000, 800);
+            frame.setContentPane(new JLabel(bg));
+
             frame.setLayout(null); // Disable layout manager for absolute positioning
             frame.setVisible(true);
     
@@ -82,10 +82,17 @@ public class GUIUART  {
             // Create a panel for Player 1
             JPanel player1Box = new JPanel();
             frame.add(player1Box); // Add the panel to the frame
-            player1Box.setBounds(100, 100, 200, 80); 
+            player1Box.setBounds(50, 80, 200, 80); 
             player1Box.setBackground(Color.WHITE); 
-            player1Box.setBorder(new LineBorder(Color.BLACK, 2));
-            player1Box.setLayout(new GridLayout(3, 2)); 
+            player1Box.setLayout(new GridLayout(3, 1)); 
+
+            player1Box.setForeground(Color.WHITE); // hvid tekst
+            playerNameLabel.setForeground(Color.WHITE); 
+            playerScoreLabel.setForeground(Color.WHITE); 
+            player1BetlLabel.setForeground(Color.WHITE);
+            player1NumLabel.setForeground(Color.WHITE); 
+            player1colorLabel.setForeground(Color.WHITE);
+            player1Box.setOpaque(false);
     
         player1Box.add(playerNameLabel); // tilføj player name label til grid
         player1Box.add(playerScoreLabel); // tilføj player score label til grid
@@ -95,10 +102,17 @@ public class GUIUART  {
         // Create a panel for Player 2
         JPanel player2Box = new JPanel();
         frame.add(player2Box); // Add the panel to the frame
-        player2Box.setBounds(350, 100, 200, 80);
+        player2Box.setBounds(340, 80, 200, 80);
         player2Box.setBackground(Color.WHITE); 
-        player2Box.setBorder(new LineBorder(Color.BLACK, 2)); 
-        player2Box.setLayout(new GridLayout(3, 2)); 
+        player2Box.setLayout(new GridLayout(3, 1)); 
+
+        player2Box.setForeground(Color.WHITE); 
+        player2NameLabel.setForeground(Color.WHITE); 
+        player2ScoreLabel.setForeground(Color.WHITE); 
+        player2BetLabel.setForeground(Color.WHITE);
+        player2NumLabel.setForeground(Color.WHITE); 
+        player2colorLabel.setForeground(Color.WHITE); 
+        player2Box.setOpaque(false);
 
 
         player2Box.add(player2NameLabel); 
@@ -109,11 +123,16 @@ public class GUIUART  {
         // player 3
         JPanel player3Box = new JPanel();
         frame.add(player3Box); 
-        player3Box.setBounds(600, 100, 200, 80); 
+        player3Box.setBounds(650, 80, 200, 80); 
         player3Box.setBackground(Color.WHITE); 
-        player3Box.setBorder(new LineBorder(Color.BLACK, 2)); // 2px black border
-        player3Box.setLayout(new GridLayout(3, 2)); 
+        player3Box.setLayout(new GridLayout(3, 1)); 
         
+        player3NameLabel.setForeground(Color.WHITE); 
+        player3ScoreLabel.setForeground(Color.WHITE); 
+        player3BetLabel.setForeground(Color.WHITE); 
+        player3NumLabel.setForeground(Color.WHITE); 
+        player3colorLabel.setForeground(Color.WHITE);
+        player3Box.setOpaque(false);
         
         player3Box.add(player3NameLabel); 
         player3Box.add(player3ScoreLabel); 
@@ -124,9 +143,8 @@ public class GUIUART  {
         // historik box til hjulet værdier
         JPanel historyBox = new JPanel();
         frame.add(historyBox); // Add the panel to the frame
-        historyBox.setBounds(100, 250, 100, 300); // Set position and size of the box
+        historyBox.setBounds(60, 260, 150, 400); // Set position and size of the box
         historyBox.setBackground(Color.WHITE); // Set the background color of the box to yellow
-        historyBox.setBorder(new LineBorder(Color.BLACK, 2)); // 2px black border
         historyBox.setLayout(new GridLayout(11, 1)); // 10 rows, 1 column
         historyBox.add(historyLabel1); // Add history label to the grid
         historyBox.add(historyLabel2); // Add history label to the grid
@@ -138,6 +156,18 @@ public class GUIUART  {
         historyBox.add(historyLabel8); // Add history label to the grid
         historyBox.add(historyLabel9); // Add history label to the grid
         historyBox.add(historyLabel10); // Add history label to the grid
+        historyBox.setOpaque(false);
+
+        historyLabel1.setForeground(Color.WHITE);
+        historyLabel2.setForeground(Color.WHITE);
+        historyLabel3.setForeground(Color.WHITE);
+        historyLabel4.setForeground(Color.WHITE);
+        historyLabel5.setForeground(Color.WHITE);
+        historyLabel6.setForeground(Color.WHITE);
+        historyLabel7.setForeground(Color.WHITE);
+        historyLabel8.setForeground(Color.WHITE);
+        historyLabel9.setForeground(Color.WHITE);
+        historyLabel10.setForeground(Color.WHITE);
 
         // 
 
@@ -157,30 +187,30 @@ public class GUIUART  {
 
                 // Draw arcs with rotationOffset applied
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 1);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 2);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 2);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 3);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 4);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 4);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 5);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 6);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 6);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 7);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 8);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 8);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius, 9);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,10);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,10);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,11);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,12);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,12);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,13);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,14);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,14);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,15);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,16);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,16);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,17);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,18);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,18);  i += 17;
                 drawSegment(g2d, Color.RED,  wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,19);  i += 17;
-                drawSegment(g2d, Color.BLACK, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,20);  i += 17;
+                drawSegment(g2d, Color.DARK_GRAY, wheelWidth, wheelHeight, i + rotationOffset, 17, centerX, centerY, radius,20);  i += 17;
                 drawSegment(g2d, Color.GREEN,wheelWidth, wheelHeight, i + rotationOffset, 20, centerX, centerY, radius,21);
-                g2d.setColor(Color.BLACK);
+                g2d.setColor(Color.DARK_GRAY);
 
                 // Draw vertical line from (100, 60) to (100, 100)
-                g2d.setColor(Color.WHITE);
+                g2d.setColor(Color.orange);
                 int xValue= 276;
                 int[] xPoints = { xValue, xValue+40, xValue+20 };
                 int[] yPoints = { 10, 10, 75 };
@@ -189,6 +219,7 @@ public class GUIUART  {
         };
         circlePanel.setBounds(200, 180, 1000, 1000);
         circlePanel.setBackground(new Color(40, 90, 30));
+        circlePanel.setOpaque(false);
         frame.add(circlePanel);
 
         frame.setVisible(true);
@@ -539,6 +570,5 @@ private static void drawSegment(Graphics2D g2d, Color c, int w, int h, int start
         });
         timer.start();
     }
-
 }
 
